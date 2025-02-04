@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Organizations</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body, .container {
+      background-color: #1c1c1e; /* Dark background for the entire page */
+    }
+    .card {
+    background-color: #2b2b2b;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out, border 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    border: 1px solid #cccccc; /* Light border on hover */
+}
+  .card-body {
+    padding: 1.5rem;
+    text-align: left;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .card-text {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #b3b3b3;
+  }
+  .card .card-title {
+      color: #ffcc00; /* Custom color for card titles */
+  }
+  .btn-primary, .btn-success {
+      border: none; /* Remove borders for buttons */
+  }
+  .list-unstyled li {
+    font-size: 0.9rem;
+    color: #dcdcdc;
+  }
+  </style>
+</head>
+<body>
+  <div class="container mt-5 text-light">
+    <h4 class="mb-4">All Organizations</h4>
+    
+    <!-- Organization Cards -->
+    <div class="row">
+      <% for (const org of allOrganization) { %>
+        <div class="col-md-4 mb-4">
+          <a href="/organizations/<%= org._id %>" class="text-decoration-none">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title"><%= org.name %></h5>
+                <p class="card-text"><%= org.description %></p>
+                
+                <p><strong>Admins:</strong></p>
+                <% if (org.admins.length > 0) { %>
+                  <ul class="list-unstyled">
+                    <% org.admins.forEach(admin => { %>
+                      <li><%= admin.username %></li>
+                    <% }) %>
+                  </ul>
+                <% } else { %>
+                  <p>No Admins Assigned</p>
+                <% } %>
+                
+                <p><strong>Created By:</strong> <%= org.createdBy ? org.createdBy.username : 'Unknown Creator' %></p>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Navigation Buttons -->
+    <div class="mt-4">
+      <a href="/" class="btn btn-outline-light me-2">Home</a>
+      <a href="/newOrganizationPage" class="btn btn-warning">Create New Organization</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

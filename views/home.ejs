@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizations</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1c1c1e; /* Dark background for the entire page */
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh; /* Ensure the body takes up at least the full height of the viewport */
+      margin: 0; /* Remove margin from body */
+    }
+    .container-fluid {
+      padding: 0; /* Remove padding from the container */
+      display: flex; /* Use flexbox for layout */
+      flex: 1; /* Allow the container to grow and fill space */
+    }
+    .sidebar {
+      background-color: #444; /* Change sidebar background color */
+      border-radius: 0; /* Remove rounded corners */
+      padding: 1.5rem; /* Padding inside sidebar */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow effect */
+      /* width: 15%; /* Fixed width for sidebar */
+      /* min-width: 200px; Minimum width for better appearance */
+      flex: 0 0 auto;
+    }
+    .sidebar h5 {
+      color: #ffffff; /* Sidebar heading color */
+    }
+    .sidebar a {
+      color: #ffcc00; /* Link color */
+      text-decoration: none; /* Remove underline */
+      margin-bottom: 0.5rem; /* Margin below buttons */
+      display: block; /* Make links block elements for better spacing */
+    }
+    .sidebar a:hover {
+      text-decoration: underline; /* Underline on hover */
+    }
+    .footer {
+      background-color: #2b2b2b; /* Footer background color */
+      color: #ffffff; /* Footer text color */
+      text-align: center; /* Center text */
+      padding: 1rem 0; /* Padding for footer */
+      width: 100%; /* Full width */
+      position: relative; /* Allow footer to sit below content */
+    }
+    .main-content {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .organization-card, .course-card {
+      background-color: #2b2b2b; /* Card background color */
+      color: #ffffff; /* Text color */
+      border-radius: 8px; /* Rounded corners */
+      padding: 1.5rem; /* Padding inside card */
+      margin-bottom: 1.5rem; /* Space below each card */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+      text-decoration: none; /* Remove underline */
+      transition: background-color 0.3s; /* Smooth transition for hover effect */
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .organization-card:hover, .course-card:hover {
+      background-color: #3a3a3a; /* Darker background on hover */
+    }
+    h1 {
+      margin-bottom: 1rem; /* Margin for headings */
+    }
+    .col-left, .col-right {
+      width: 40%; /* Set width of each column to 40% */
+      margin-left: 20px;
+    }
+    .col-right {
+      margin-left: 40px; /* Add space between columns */
+    }
+    .row {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">LMS</a>
+      <!-- Adjust the alignment of the navbar-toggler button -->
+      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/organizations">All Organizations</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/allCourses">All Courses</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/newAdminPage">Create Admin</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/newOrganizationPage">Create Organization</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/newCoursePage">Create Course</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+      <h5>Navigation</h5>
+      <a href="/newAdminPage">Create Admin</a>
+      <a href="/newOrganizationPage">Create Organization</a>
+      <a href="/organizations">All Organizations</a>
+      <a href="/allCourses">All Courses</a>
+      <a href="/newCoursePage">Create New Course</a>
+    </div>
+  
+    <!-- Main Content Area -->
+    <div class="main-content col-md-10 col-12"> <!-- Adds full width on small screens -->
+      <div class="row">
+        <!-- Left Side: Organizations -->
+        <div class="col-left col-lg-5 col-md-6 col-12"> <!-- Adjusted Bootstrap classes -->
+          <h1 class="text-light">All Organizations</h1>
+          <div class="row">
+            <% allOrganizations.forEach(org => { %>
+              <a href="/organizations/<%= org._id %>" class="organization-card col-12"> <!-- Link to organization details -->
+                <h5><%= org.name %></h5>
+                <p><strong>Description:</strong> <%= org.description || 'No Description Available' %></p>
+                <h6>Admins:</h6>
+                <% if (org.admins.length > 0) { %>
+                  <ul class="list-unstyled">
+                    <% org.admins.forEach(admin => { %>
+                      <li><strong><%= admin.username %></strong> - <%= admin.email %></li>
+                    <% }) %>
+                  </ul>
+                <% } else { %>
+                  <p>No Admins Assigned</p>
+                <% } %>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+  
+        <!-- Right Side: All Courses -->
+        <div class="col-right col-lg-5 col-md-6 col-12"> <!-- Adjusted Bootstrap classes -->
+          <h1 class="text-light">All Courses</h1>
+          <div class="row">
+            <% allCourses.forEach(course => { %>
+              <a href="/courses/<%= course._id %>" class="course-card col-12"> <!-- Link to course details -->
+                <h5><%= course.title %></h5>
+                <% if (course.images.length > 0) { %>
+                  <img src="<%= course.images[0].url %>" alt="Course Image" style="width: 100%; height: auto;"> 
+                <% } %>
+                <p><strong>Description:</strong> <%= course.description || 'No Description Available' %></p>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div> <!-- Closing the main-content div here -->
+  </div> <!-- Closing the outer container-fluid here -->
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2024 LMS. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

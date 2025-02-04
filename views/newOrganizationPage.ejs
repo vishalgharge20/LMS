@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Organization</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
+      <h3 class="text-center text-primary">Create Organization</h3>
+      
+      <form action="/createOrganization" method="POST">
+        <div class="mb-3">
+          <label for="orgName" class="form-label">Organization Name</label>
+          <input type="text" name="name" id="orgName" class="form-control" placeholder="Enter organization name" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="orgDesc" class="form-label">Description</label>
+          <textarea name="description" id="orgDesc" class="form-control" rows="3" placeholder="Describe the organization" required></textarea>
+        </div>
+
+        <div class="container mt-4">
+          <div class="mb-3">
+              <label for="existingAdmins" class="form-label">Select Admin</label>
+              <select name="admin" id="existingAdmins" class="form-select">
+                  <option value="" selected>None</option>
+                  <% availableAdmins.forEach(admin => { %>
+                      <option value="<%= admin._id %>"><%= admin.username %> - <%= admin.email %></option>
+                  <% }) %>
+              </select>
+          </div>
+      
+          <div id="newAdminForm" style="display: none;">
+              <h5>Create New Admin</h5>
+              <div class="mb-3">
+                  <label for="adminUsername" class="form-label">Username</label>
+                  <input type="text" name="adminUsername" id="adminUsername" class="form-control">
+              </div>
+              <div class="mb-3">
+                  <label for="adminEmail" class="form-label">Email</label>
+                  <input type="email" name="adminEmail" id="adminEmail" class="form-control">
+              </div>
+              <div class="mb-3">
+                  <label for="adminPassword" class="form-label">Password</label>
+                  <input type="password" name="adminPassword" id="adminPassword" class="form-control">
+              </div>
+          </div>
+      </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Create Organization</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Toggle visibility and "required" attribute of new admin fields based on selection
+    const existingAdmins = document.getElementById('existingAdmins');
+    const newAdminForm = document.getElementById('newAdminForm');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminEmail = document.getElementById('adminEmail');
+    const adminPassword = document.getElementById('adminPassword');
+
+    existingAdmins.addEventListener('change', function () {
+      if (this.value) {
+        newAdminForm.style.display = 'none';
+        adminUsername.removeAttribute('required');
+        adminEmail.removeAttribute('required');
+        adminPassword.removeAttribute('required');
+      } else {
+        newAdminForm.style.display = 'block';
+        adminUsername.setAttribute('required', 'true');
+        adminEmail.setAttribute('required', 'true');
+        adminPassword.setAttribute('required', 'true');
+      }
+    });
+  </script>
+
+</body>
+</html>

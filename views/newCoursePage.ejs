@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f9fc; /* Light grey background */
+        }
+
+        .card {
+            background-color: #ffffff; /* White card background */
+        }
+
+        .container-title {
+            background-color: #e9ecef; /* Light grey for title and description card */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .container-assignments {
+            background-color: #e9ecef; /* Light grey for assignments and APKs card */
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .container-chapters {
+            background-color: #e9ecef; /* Light grey for chapters card */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .text-primary {
+            color: #007bff; /* Bootstrap primary color */
+        }
+
+        .chapter {
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: move; /* Show move cursor */
+        }
+
+        .video-preview {
+            display: block; /* Show video previews */
+            margin-top: 10px;
+            max-width: 100%; /* Responsive */
+            max-height: 400px; /* Limit height */
+            border: 1px solid #ced4da; /* Light border */
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        .img-preview {
+            display: block; /* Initially hidden */
+            margin-top: 10px;
+            max-width: 100%; /* Responsive */
+            max-height: 400px; /* Limit height */
+            border: 1px solid #ced4da; /* Light border */
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        .remove-video-btn {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
+            <h3 class="text-center text-primary">Create New Course</h3>
+
+            <form action="/createCourse" method="POST" enctype="multipart/form-data">
+                <!-- Course Title and Description -->
+                <div class="container-title mb-4">
+                    <h5>Course Information</h5>
+                    <div class="mb-3">
+                        <label for="courseTitle" class="form-label">Course Title</label>
+                        <input type="text" id="courseTitle" name="title" class="form-control" placeholder="Enter course title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="courseDescription" class="form-label">Course Description</label>
+                        <textarea id="courseDescription" name="description" class="form-control" rows="3" placeholder="Provide a brief description" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="courseImages" class="form-label">Add Images</label>
+                        <input type="file" id="courseImages" name="images" class="form-control" accept="image/*" onchange="previewImages(event)">
+                    </div>
+                    <!-- Image Preview Section -->
+                    <div id="imagePreviewContainer"></div>
+                </div>
+
+                <!-- Chapters Section -->
+                <div class="container-chapters mb-4" id="chaptersContainer">
+                    <h5>Chapters</h5>
+                    <div id="chaptersList" class="list-group" style="cursor: move;">
+                        <!-- Chapters will be dynamically added here -->
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" onclick="addChapter()">Add New Chapter</button>
+                        <button type="button" class="btn btn-danger" id="removeChapterBtn" style="display:none;" onclick="removeAllChapters()">Remove All Chapters</button>
+                    </div>
+                </div>
+
+                <!-- Assignments and APKs Section -->
+                <div class="container-assignments mb-4">
+                    <h5>Additional Resources</h5>
+                    <div class="mb-3">
+                        <label for="assignments" class="form-label">Add Assignments</label>
+                        <input type="file" id="assignments" name="assignments" class="form-control" accept=".pdf,.doc,.docx" multiple>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apks" class="form-label">Add APKs</label>
+                        <input type="file" id="apks" name="apks" class="form-control" accept=".apk" multiple>
+                    </div>
+                </div>
+
+                <!-- Create Course Button -->
+                <button type="submit" class="btn btn-primary w-100 mt-3">Create Course</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        // Initialize Sortable for chapters list
+        const sortable = new Sortable(document.getElementById('chaptersList'), {
+            animation: 150,
+            handle: '.chapter', // Handle for drag-and-drop
+            onEnd: function (evt) {
+                console.log(`Moved chapter from index ${evt.oldIndex} to ${evt.newIndex}`);
+            }
+        });
+
+        // Function to add a new chapter
+        function addChapter() {
+            const chapterDiv = document.createElement('div');
+            chapterDiv.className = 'chapter list-group-item';
+            
+            chapterDiv.innerHTML = `
+                <div class="mb-3">
+                    <label for="chapterName" class="form-label">Chapter Name</label>
+                    <input type="text"  name="chapterTitles[]" class="form-control chapter-name" placeholder="Enter chapter name" required>
+                </div>
+                <div class="videosList"></div> <!-- Container for videos -->
+                <div class="mb-3 mt-2 d-flex justify-content-between">
+                    <button type="button" class="btn btn-danger" onclick="removeChapter(this)">Remove Chapter</button>
+                    <button type="button" class="btn btn-secondary" onclick="addMoreVideos(this)">Add Videos</button>
+                </div>
+            `;
+            
+            // Append the new chapter to the chapters list
+            document.getElementById('chaptersList').appendChild(chapterDiv);
+            toggleRemoveAllChaptersButton(); // Show/hide remove button based on chapter count
+        }
+
+
+        // Function to create a remove button for a chapter
+        function createRemoveChapterButton(chapterDiv) {
+            const removeButtonDiv = document.createElement('div');
+            removeButtonDiv.className = 'mb-3';
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-danger';
+            removeButton.textContent = 'Remove Chapter';
+            removeButton.onclick = function () {
+                removeChapter(chapterDiv);
+            };
+            removeButtonDiv.appendChild(removeButton);
+            return removeButtonDiv;
+        }
+
+
+        // Function to remove a chapter
+        function removeChapter(button) {
+            const chapterDiv = button.closest('.chapter');
+            chapterDiv.remove();
+            toggleRemoveAllChaptersButton(); // Update visibility of the remove all button
+        }
+
+        // Example toggle function to show/hide remove all chapters button
+        function toggleRemoveAllChaptersButton() {
+            const removeAllBtn = document.getElementById('removeChapterBtn');
+            const chapters = document.querySelectorAll('.chapter');
+            removeAllBtn.style.display = chapters.length > 0 ? 'block' : 'none'; // Show button if there are chapters
+        }
+
+        
+        // Function to add more videos to a chapter
+        function addMoreVideos(button) {
+            const chapterDiv = button.closest('.chapter');
+            const videoInputDiv = document.createElement('div');
+            videoInputDiv.className = 'mb-3';
+            videoInputDiv.innerHTML = `
+                <label for="videoName" class="form-label">Video Name</label>
+                <input type="text" class="form-control video-name" placeholder="Enter video name" required>
+                <input type="file" class="form-control" name="videos" accept="video/*" multiple onchange="previewVideos(event, this)">
+                <div class="video-previews mt-2"></div>
+                <button type="button" class="btn btn-danger remove-video-btn" onclick="removeVideo(this)">Remove Video</button>
+            `;
+            chapterDiv.appendChild(videoInputDiv);
+        }
+
+        // image Preview
+        function previewImages(event) {
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        imagePreviewContainer.innerHTML = ''; // Clear previous previews
+
+        const files = event.target.files;
+
+        if (files.length === 0) {
+            console.log('No files selected');
+            return;
+        }
+
+        // Loop through selected files
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // Check if the file is an image
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'img-preview'; // Apply image preview styles
+
+                // Append the image preview to the container
+                imagePreviewContainer.appendChild(img);
+                console.log(`Previewing image: ${file.name}`);
+            } else {
+                console.log('Selected file is not an image');
+            }
+        }
+    }
+
+
+        // Function to remove all chapters
+        function removeAllChapters() {
+            const chaptersList = document.getElementById('chaptersList');
+            chaptersList.innerHTML = ''; // Clear all chapters
+            toggleRemoveAllChaptersButton(); // Update button visibility
+        }
+
+        // Function to toggle the visibility of the "Remove All Chapters" button
+        function toggleRemoveAllChaptersButton() {
+            const chaptersList = document.getElementById('chaptersList');
+            const removeButton = document.getElementById('removeChapterBtn');
+            removeButton.style.display = chaptersList.childElementCount > 0 ? 'block' : 'none';
+        }
+
+        // image preview
+        function previewImages(event) {
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        imagePreviewContainer.innerHTML = ''; // Clear previous previews
+
+        const files = event.target.files;
+
+        if (files.length === 0) {
+            console.log('No files selected');
+            return;
+        }
+
+
+        // Loop through selected files
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // Check if the file is an image
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'img-preview'; // Apply image preview styles
+
+                // Append the image preview to the container
+                imagePreviewContainer.appendChild(img);
+            } else {
+                console.log('Selected file is not an image');
+            }
+        }
+    }
+
+        // Function to remove individual videos
+        function removeVideo(button) {
+            const videoInputDiv = button.closest('.mb-3');
+            videoInputDiv.remove();
+        }
+
+
+        const formData = new FormData();
+        const chapterTitles = document.querySelectorAll('.chapter-name');
+
+        chapterTitles.forEach((input, index) => {
+            formData.append('chapterTitles[]', input.value);
+            // Assuming you have a file input or other logic to append videos for each chapter
+            const videoFiles = document.querySelectorAll(`.video-file-input[data-chapter-index="${index}"]`);
+            videoFiles.forEach(fileInput => {
+                formData.append('videos', fileInput.files[0]);
+            });
+        });
+
+        // Now submit the form data
+        fetch('/create-course', {
+            method: 'POST',
+            body: formData
+        });
+
+
+    </script>
+</body>
+
+</html>
